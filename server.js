@@ -7,6 +7,7 @@ import userRoutes from "./routes/userRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import saleRoutes from "./routes/sale.js";
 import connectDB from "./models/db.js";
+import customerRoutes from "./routes/costumerRoutes.js";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/sales", saleRoutes);
+app.use("/api/customers", customerRoutes);
 
 // Connect database
 connectDB();

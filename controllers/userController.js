@@ -167,3 +167,29 @@ export const changeUserRole = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+export const filterUsers = async (req, res) => {
+  try {
+    const { role, isActive } = req.body;
+    const filter = {};
+
+    if (role) {
+      filter.role = role;
+    }
+    if (isActive) {
+      filter.isActive = isActive;
+    }
+
+    const users = await User.find(filter, { password: 0, __v: 0, _id: 0 }).sort({ user_id: 1 });
+
+    res.status(200).json({
+      message: "Filtered users fetched successfully",
+      count: users.length,
+      users,
+    });
+  } catch (error) {
+    console.error("Filter users error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+

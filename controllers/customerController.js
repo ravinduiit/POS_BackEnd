@@ -32,6 +32,41 @@ export const createCustomer = async (req, res) => {
   }
 };
 
+export const toggleCustomerStatus = async (req, res) => {
+  try {
+    const { customer_id } = req.body;
+
+    if (!customer_id || isNaN(customer_id)) {
+      return res.status(400).json({
+        error: "Valid customer_id is required",
+      });
+    }
+
+    const customer = await Customer.findOne({ customer_id: Number(customer_id) });
+
+    if (!customer) {
+      return res.status(404).json({
+        error: "Customer not found",
+      });
+    }
+
+    customer.isActive = !customer.isActive;
+    await customer.save();
+
+    res.status(200).json({
+      message: `Customer has been ${customer.isActive ? "activated" : "deactivated"} successfully`,
+      customer: {
+        customer_id: customer.customer_id,
+        name: customer.name,
+        isActive: customer.isActive,
+      },
+    });
+  } catch (error) {
+    console.error("Toggle customer status error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 export const getCustomerDue = async (req, res) => {
   try {
     const { customer_id } = req.body;
@@ -147,6 +182,71 @@ export const updateCustomerPhone = async ({ customer_id, phone }) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+export const getCustomerList = async (req, res) => {
+  try {
+    const customers = await Customer.find({}, { _id: 0, __v: 0 }).sort({ customer_id: 1 });
+
+    res.status(200).json({
+      message: "Customer list fetched successfully",
+      count: customers.length,
+      customers,
+    });
+  } catch (error) {
+    console.error("Get customer list error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const getSingleCustomer = async (req, res) => {
+  try {
+    const { customer_id } = req.body;
+    const customer = await Customer.findOne(
+      { customer_id },
+      { _id: 0, __v: 0 }
+    );
+    if (!customer) {
+      return res.status(404).json({ error: "Customer not found" });
+    }
+    res.status(200).json({
+      message: "Customer fetched successfully",
+      customer,
+    });
+  }
+
+  catch (error) {
+    console.error("Get single customer error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const filterCustomer = async (req, res) => {
+  try {
+    const { name, phone, customer_id } = req.body;
+    const filter = {};
+    if (name) {
+      filter.name = { $regex: name, $options: "i" };
+    }
+    if (phone) {
+      filter.phone = { $regex: phone, $options: "i" };
+    }
+    if (customer_id) {
+      filter.customer_id = customer_id;
+    }
+    const customers = await Customer.find(filter, { _id: 0, __v: 0 }).sort({ customer_id: 1 });
+    res.status(200).json({
+      message: "Customer filter fetched successfully",
+      count: customers.length,
+      customers,
+    });
+  }
+  catch (error) {
+    console.error("Filter customer error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
 
 
 

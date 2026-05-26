@@ -42,6 +42,11 @@ const customerSchema = new mongoose.Schema(
 
     debt_list: [debt_listSchema],
     
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    
   },
   { timestamps: true }
 );
