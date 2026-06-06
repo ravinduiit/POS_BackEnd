@@ -177,12 +177,12 @@ export const createSale = async (req, res) => {
     const discountValue = Number(discount) || 0;
     const grandTotal = Math.max(subtotal - discountValue, 0);
 
-    if (
-      grandTotal_from_client !== undefined &&
-      Math.abs(grandTotal - grandTotal_from_client) > 0.01
-    ) {
-      throw new Error("Grand total mismatch. Please refresh.");
-    }
+    // if (
+    //   grandTotal_from_client !== undefined &&
+    //   Math.abs(grandTotal - grandTotal_from_client) > 0.01
+    // ) {
+    //   throw new Error("Grand total mismatch. Please refresh.");
+    // }
 
     const { balance, dueAmount } = calculatePayment({
         paymentMethod,
