@@ -16,6 +16,7 @@ export const addProduct = async (req, res) => {
       stockQty,
       reorderLevel,
       description,
+      wholesale_price,
       image,
     } = req.body;
 
@@ -51,6 +52,7 @@ export const addProduct = async (req, res) => {
       brand_id: brand_id || "",
       unit,
       best_price,
+      wholesale_price,
       costPrice: Number(costPrice),
       sellingPrice: Number(sellingPrice),
       stockQty: Number(stockQty),
@@ -70,6 +72,7 @@ export const addProduct = async (req, res) => {
         category: newProduct.category,
         brand: newProduct.brand,
         unit: newProduct.unit,
+        wholesale_price: newProduct.wholesale_price,
         best_price: newProduct.best_price,
         costPrice: newProduct.costPrice,
         sellingPrice: newProduct.sellingPrice,

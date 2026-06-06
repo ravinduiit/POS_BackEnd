@@ -111,9 +111,12 @@ export const createSale = async (req, res) => {
       discount = 0,
       customer_id = 0,
       grandTotal_from_client,
+      sale_type,
       createdBy,
       cut_debit = false,
     } = req.body;
+
+    console.log("dddddddddddddddddddddd " + sale_type);
 
     // Basic validation
     if (!items || items.length === 0) {
@@ -151,8 +154,12 @@ export const createSale = async (req, res) => {
       }
 
       // Negative stock allowed temporarily
-
-      const price = Number(product.sellingPrice);
+      let price = 0;
+      if(sale_type === "wholesale"){
+        price = Number(product.wholesale_price);
+      } else {
+        price = Number(product.sellingPrice);
+      }
       const lineTotal = item.quantity * price;
 
       subtotal += lineTotal;
@@ -208,6 +215,7 @@ export const createSale = async (req, res) => {
       discount: discountValue,
       grandTotal,
       paymentMethod,
+      sale_type,
       paidAmount,
       balance,
       dueAmount,

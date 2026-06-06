@@ -79,6 +79,11 @@ const saleSchema = new mongoose.Schema(
       default: 0,
     },
 
+    sale_type: {
+      type: String,
+      required : true,
+    },
+
     // optional tracking
     createdBy: {
         type: String,

@@ -57,7 +57,11 @@ const productSchema = new Schema(
       required: true,
       min: 0,
     },
-
+    wholesale_price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
     stockQty: {
       type: Number,
       required: true,
