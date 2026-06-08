@@ -14,6 +14,12 @@ const productSchema = new Schema(
       trim: true,
     },
 
+    sinhala_name: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     barcode: {
       type: String,
       default: "",
@@ -37,12 +43,12 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
       min: 0,
-    },
+    },  // this is the lowest price that the product has been sold for, it will be updated whenever a sale is made
 
     unit: {
       type: String,
       required: true,
-      enum: ["piece", "kg", "g", "liter", "ml", "packet", "box", "bottle"],
+      enum: ["piece", "kg", "g", "liter", "ml", "packet", "box", "bottle", "pack"],
       default: "piece",
     },
 
@@ -50,18 +56,20 @@ const productSchema = new Schema(
       type: Number,
       required: true,
       min: 0,
-    },
+    },  // this is the price that the store owner bought the product for
 
     sellingPrice: {
       type: Number,
       required: true,
       min: 0,
-    },
+    }, // this is the price that the store owner sells the product for
+
     wholesale_price: {
       type: Number,
       required: true,
       min: 0,
-    },
+    }, // this is the price that the store owner sells the product for when the quantity is above the wholesale threshold
+
     stockQty: {
       type: Number,
       required: true,

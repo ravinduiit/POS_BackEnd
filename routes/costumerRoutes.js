@@ -6,6 +6,7 @@ import {
   getAllCustomersTotalDue,
   getTodayTotalDue,
   updateCustomerPhone,
+  getCustomerIDNameList,
   updateCustomerDue,
   getCustomerList,
   toggleCustomerStatus,
@@ -35,6 +36,8 @@ router.post("/update/customerDue", updateCustomerDue);
 router.post("/filter", filterCustomer);
 
 router.post("/toggle_status", toggleCustomerStatus);
+
+router.get("/id_name_list", getCustomerIDNameList);
 
 
 export default router;

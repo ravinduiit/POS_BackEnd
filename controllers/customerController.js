@@ -198,6 +198,20 @@ export const getCustomerList = async (req, res) => {
   }
 };
 
+export const getCustomerIDNameList = async (req, res) => {
+  try {
+    const customers = await Customer.find({}, { _id: 0, customer_id: 1, name: 1 }).sort({ customer_id: 1 });
+
+    res.status(200).json({
+      message: "Customer id and name list fetched successfully",
+      customers,
+    });
+  } catch (error) {
+    console.error("Get customer list error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 export const getSingleCustomer = async (req, res) => {
   try {
     const { customer_id } = req.body;

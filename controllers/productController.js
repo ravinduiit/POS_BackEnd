@@ -6,6 +6,7 @@ export const addProduct = async (req, res) => {
   try {
     const {
       name,
+      sinhala_name,
       barcode,
       category_id,
       brand_id,
@@ -47,6 +48,7 @@ export const addProduct = async (req, res) => {
     const newProduct = new Product({
       product_id: counter.seq,
       name,
+      sinhala_name: sinhala_name || "",
       barcode,
       category_id,
       brand_id: brand_id || "",
@@ -68,6 +70,7 @@ export const addProduct = async (req, res) => {
       product: {
         product_id: newProduct.product_id,
         name: newProduct.name,
+        sinhala_name: newProduct.sinhala_name,
         barcode: newProduct.barcode,
         category: newProduct.category,
         brand: newProduct.brand,
@@ -92,7 +95,7 @@ export const addProduct = async (req, res) => {
 // for get product list
 export const getProductList = async (req, res) => {
   try {
-    const products = await Product.find({}, { _id: 0, __v: 0 }).sort({ product_id: 1 });
+    const products = await Product.find({}, { _id: 0, __v: 0 }).sort({ product_id: -1 }).limit(15);
 
     res.status(200).json({
       message: "Product list fetched successfully",
@@ -143,6 +146,7 @@ export const updateProduct = async (req, res) => {
     const { product_id } = req.body;
     const {
       name,
+      sinhala_name,
       barcode,
       category,
       brand,
@@ -150,12 +154,16 @@ export const updateProduct = async (req, res) => {
       costPrice,
       sellingPrice,
       best_price,
+      wholesale_price,
       stockQty,
       reorderLevel,
       description,
       image,
       lastStockFillingDate,
     } = req.body;
+
+    console.log("ggggggggggggggg " + wholesale_price);
+
 
     if (!product_id || isNaN(product_id)) {
       return res.status(400).json({
@@ -181,6 +189,7 @@ export const updateProduct = async (req, res) => {
     }
 
     if (name !== undefined) product.name = name;
+    if (sinhala_name !== undefined) product.sinhala_name = sinhala_name;
     if (barcode !== undefined) product.barcode = barcode;
     if (category !== undefined) product.category = category;
     if (brand !== undefined) product.brand = brand;
@@ -190,6 +199,7 @@ export const updateProduct = async (req, res) => {
     if (sellingPrice !== undefined) product.sellingPrice = Number(sellingPrice);
     if (stockQty !== undefined) product.stockQty = Number(stockQty);
     if (reorderLevel !== undefined) product.reorderLevel = Number(reorderLevel);
+    if (wholesale_price !== undefined) product.wholesale_price = Number(wholesale_price);
     if (description !== undefined) product.description = description;
     if (image !== undefined) product.image = image;
     if (lastStockFillingDate !== undefined) {
@@ -203,6 +213,7 @@ export const updateProduct = async (req, res) => {
       product: {
         product_id: product.product_id,
         name: product.name,
+        sinhala_name: product.sinhala_name,
         barcode: product.barcode,
         category: product.category,
         brand: product.brand,
@@ -299,7 +310,7 @@ export const searchProducts = async (req, res) => {
           { barcode: searchRegex },
           { category: searchRegex },
           { brand: searchRegex },
-          { description: searchRegex },
+          { sinhala_name: searchRegex },
         ],
       },
       { _id: 0, __v: 0 }
@@ -319,7 +330,7 @@ export const searchProducts = async (req, res) => {
 // filter by category, brands, stock status, active status
 export const filterProducts = async (req, res) => {
   try {
-    const { name, category, brand, stockStatus, isActive } = req.body;
+    const { name, category, brand, stockStatus, isActive, barcode } = req.body;
 
     const filter = {};
 
@@ -333,6 +344,10 @@ export const filterProducts = async (req, res) => {
 
     if (brand && brand.trim()) {
       filter.brand = new RegExp(`^${brand.trim()}$`, "i");
+    }
+
+    if (barcode && barcode.trim()) {
+      filter.barcode = new RegExp(`^${barcode.trim()}$`, "i");
     }
 
     if (typeof isActive === "boolean") {
@@ -354,8 +369,8 @@ export const filterProducts = async (req, res) => {
     }
 
     const products = await Product.find(filter, { _id: 0, __v: 0 }).sort({
-      product_id: 1,
-    });
+      product_id: -1,
+    }).limit(15);
 
     res.status(200).json({
       message: "Filtered products fetched successfully",
