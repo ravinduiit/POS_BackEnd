@@ -16,15 +16,15 @@ const router = express.Router();
 
 router.post(
   "/add",
-  verifyToken,
-  authorizeRoles("Admin"),
+  // verifyToken,
+  // authorizeRoles("Admin"),
   addCategory
 );
 
 router.get(
   "/list",
-  verifyToken,
-  authorizeRoles("Admin", "Cashier"),
+  // verifyToken,
+  // authorizeRoles("Admin", "Cashier"),
   getCategoryList
 );
 

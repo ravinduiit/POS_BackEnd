@@ -52,7 +52,7 @@ export const addCategory = async (req, res) => {
 
 export const getCategoryList = async (req, res) => {
   try {
-    const categories = await Category.find({}, { _id: 0, __v: 0 }).sort({
+    const categories = await Category.find({}, { _id: 0, name: 1, category_id: 1 }).sort({
       category_id: 1,
     });
 

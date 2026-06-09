@@ -3,7 +3,7 @@ import Counter from "../models/Counter.js";
 
 export const createCustomer = async (req, res) => {
   try {
-    const { name, phone } = req.body;
+    const { name, phone, total_due, email } = req.body;
 
     // Generate unique customer_id
     const counter = await Counter.findOneAndUpdate(
@@ -17,7 +17,8 @@ export const createCustomer = async (req, res) => {
       customer_id,
       name,
       phone,
-      total_due: 0,
+      total_due,
+      email,
       debt_list: [],
     });
 

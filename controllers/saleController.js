@@ -438,3 +438,36 @@ export const getSalesOverTime = async (req, res) => {
     });
   }
 };
+
+export const getSaleDetailsById = async (req, res) => {
+  try {
+    console.log("hiiii")
+    const { selling_id } = req.body;
+
+    if (!selling_id) {
+      return res.status(400).json({
+        success: false,
+        message: "Sale ID is required",
+      });
+    }
+
+    const sale = await Sale.findOne({ selling_id });
+
+    if (!sale) {
+      return res.status(404).json({
+        success: false,
+        message: "Sale not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: sale,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};

@@ -40,6 +40,12 @@ const customerSchema = new mongoose.Schema(
       default: 0,
     },
 
+    email: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
     debt_list: [debt_listSchema],
     
     isActive: {

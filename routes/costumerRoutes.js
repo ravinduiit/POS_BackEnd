@@ -9,6 +9,7 @@ import {
   getCustomerIDNameList,
   updateCustomerDue,
   getCustomerList,
+  getSingleCustomer,
   toggleCustomerStatus,
   filterCustomer
 } from "../controllers/customerController.js";
@@ -38,6 +39,8 @@ router.post("/filter", filterCustomer);
 router.post("/toggle_status", toggleCustomerStatus);
 
 router.get("/id_name_list", getCustomerIDNameList);
+
+router.post("/customer_details", getSingleCustomer );
 
 
 export default router;

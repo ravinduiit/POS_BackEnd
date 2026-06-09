@@ -12,9 +12,6 @@ import {
   getProductByBarcode,
   updateProductStock
 
-
-
-
 } from "../controllers/productController.js";
 import verifyToken from "../middleware/authMiddleware.js";
 import authorizeRoles from "../middleware/roleMiddleware.js";

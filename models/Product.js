@@ -48,8 +48,8 @@ const productSchema = new Schema(
     unit: {
       type: String,
       required: true,
-      enum: ["piece", "kg", "g", "liter", "ml", "packet", "box", "bottle", "pack"],
-      default: "piece",
+      enum: ["M", "Kg", "g", "Liter", "Case", "Packs", "Box", "Bottle", "Pcs"],
+      default: "Pcs",
     },
 
     costPrice: {
