@@ -52,7 +52,7 @@ export const addBrand = async (req, res) => {
 
 export const getBrandList = async (req, res) => {
   try {
-    const brands = await Brand.find({}, { _id: 0, name: 1, brand_id: 1 }).sort({
+    const brands = await Brand.find({}, { _id: 0, name: 1, brand_id: 1, description: 1, isActive: 1 }).sort({
       brand_id: 1,
     });
 
