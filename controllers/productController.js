@@ -4,6 +4,7 @@ import Counter from "../models/Counter.js";
 // for add a product
 export const addProduct = async (req, res) => {
   try {
+    console.log("add product called");
     const {
       name,
       sinhala_name,
@@ -17,6 +18,7 @@ export const addProduct = async (req, res) => {
       stockQty,
       reorderLevel,
       description,
+      rate,
       wholesale_price,
       image,
     } = req.body;
@@ -60,6 +62,7 @@ export const addProduct = async (req, res) => {
       stockQty: Number(stockQty),
       reorderLevel: reorderLevel !== undefined ? Number(reorderLevel) : 5,
       description: description || "",
+      rate: Number(rate) || 0,
       image: image || "",
     });
 
@@ -84,6 +87,7 @@ export const addProduct = async (req, res) => {
         description: newProduct.description,
         image: newProduct.image,
         isActive: newProduct.isActive,
+        rate: newProduct.rate,
       },
     });
   } catch (error) {
@@ -160,9 +164,9 @@ export const updateProduct = async (req, res) => {
       description,
       image,
       lastStockFillingDate,
+      rate,
     } = req.body;
 
-    console.log("ggggggggggggggg " + wholesale_price);
 
 
     if (!product_id || isNaN(product_id)) {
@@ -205,6 +209,7 @@ export const updateProduct = async (req, res) => {
     if (lastStockFillingDate !== undefined) {
       product.lastStockFillingDDate = lastStockFillingDate || null;
     }
+    if (rate !== undefined) product.rate = Number(rate);
 
     await product.save();
 
@@ -227,6 +232,7 @@ export const updateProduct = async (req, res) => {
         image: product.image,
         lastStockFillingDate: product.lastStockFillingDate,
         isActive: product.isActive,
+        rate: product.rate,
       },
     });
   } catch (error) {
@@ -292,6 +298,7 @@ export const getActiveProductList = async (req, res) => {
 
 // for search product by any keyword
 export const searchProducts = async (req, res) => {
+
   try {
     const { keyword } = req.body;
 
@@ -312,6 +319,7 @@ export const searchProducts = async (req, res) => {
           { brand: searchRegex },
           { sinhala_name: searchRegex },
         ],
+        isActive: true,
       },
       { _id: 0, __v: 0 }
     ).sort({ product_id: 1 });

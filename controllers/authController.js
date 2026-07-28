@@ -159,7 +159,7 @@ export const loginUser = async (req, res) => {
         isActive: user.isActive,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "30s" }
+      { expiresIn: "1d" }
     );
 
     // Refresh Token

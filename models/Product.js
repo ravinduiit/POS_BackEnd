@@ -83,6 +83,12 @@ const productSchema = new Schema(
       min: 0,
     },
 
+    rate: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    
     description: {
       type: String,
       default: "",

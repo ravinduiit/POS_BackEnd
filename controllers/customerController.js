@@ -186,7 +186,7 @@ export const updateCustomerPhone = async ({ customer_id, phone }) => {
 
 export const getCustomerList = async (req, res) => {
   try {
-    const customers = await Customer.find({}, { _id: 0, __v: 0 }).sort({ customer_id: 1 });
+    const customers = await Customer.find({isActive: true}, { _id: 0, __v: 0 }).sort({ customer_id: 1 });
 
     res.status(200).json({
       message: "Customer list fetched successfully",
