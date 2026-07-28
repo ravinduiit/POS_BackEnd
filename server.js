@@ -18,7 +18,11 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin:[ "http://localhost:5173",
+      "http://wavepos.s3-website-ap-southeast-2.amazonaws.com",
+      "https://d1t4byt8d25y4p.cloudfront.net",
+      "https://pos.buylottox.com"
+    ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
