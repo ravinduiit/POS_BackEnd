@@ -46,7 +46,7 @@ const saleSchema = new mongoose.Schema(
       default: 0,
     },
 
-    grandTotal: { // total after discount
+    grandTotal: { // total after discount (final bill total add should be there)
       type: Number,
       required: true,
     },
@@ -72,6 +72,11 @@ const saleSchema = new mongoose.Schema(
     customer_id: {
         type: Number,
         default: 0,
+    },
+
+    customer_name: {
+        type: String,
+        default: null,
     },
 
     dueAmount: {

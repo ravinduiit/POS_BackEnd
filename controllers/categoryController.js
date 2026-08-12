@@ -134,16 +134,9 @@ export const updateCategory = async (req, res) => {
       });
     }
 
-    if (name !== undefined) {
-      if (!name.trim()) {
-        return res.status(400).json({
-          error: "Category name cannot be empty",
-        });
-      }
-
+    if (name) {
       const existingCategory = await Category.findOne({
-        name: { $regex: `^${name.trim()}$`, $options: "i" },
-        category_id: { $ne: Number(category_id) },
+        name: { $regex: `^${name.trim()}$`, $options: "i" }
       });
 
       if (existingCategory) {
@@ -155,7 +148,7 @@ export const updateCategory = async (req, res) => {
       category.name = name.trim();
     }
 
-    if (description !== undefined) {
+    if (description) {
       category.description = description.trim();
     }
 

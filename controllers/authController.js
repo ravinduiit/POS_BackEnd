@@ -133,6 +133,7 @@ export const registerUser = async (req, res) => {
 // --- LOGIN LOGIC ---
 export const loginUser = async (req, res) => {
   try {
+    console.log("hi welcome to login");
     const { email, password } = req.body;
 
     const user = await User.findOne({ email: email });

@@ -27,9 +27,8 @@ const calculatePayment = ({
     if (paidAmount >= grandTotal) {
       if (cut_debit) {
         if (!customer_id) {
-          throw new Error("Customer required for credit sale");
+          throw new Error("Customer name required for credit sale");
         }
-
         balance = 0;
         dueAmount = grandTotal - paidAmount; // negative
       } else {
@@ -50,6 +49,14 @@ const calculatePayment = ({
     dueAmount = 0;
   }
 
+  if (paymentMethod === "debit") {
+    if (!customer_id) {
+      throw new Error("Customer required for credit sale");
+    }
+    balance = 0;
+    dueAmount = grandTotal;
+  }
+
   return { balance, dueAmount };
 };
 
@@ -60,6 +67,7 @@ const updateCustomerBalance = async ({
   grandTotal,
   cut_debit,
   selling_id,
+  dueAmount,
   session,
 }) => {
   const hasCustomer = customer_id && customer_id !== 0;
@@ -68,12 +76,12 @@ const updateCustomerBalance = async ({
 
   let amountDiff = 0;
 
-  if (paidAmount < grandTotal) {
+  if (dueAmount > 0) {
     // increase debt
-    amountDiff = grandTotal - paidAmount;
-  } else if (paidAmount > grandTotal && cut_debit) {
+    amountDiff = dueAmount;
+  } else if (dueAmount < 0 && cut_debit) {
     // reduce debt
-    amountDiff = grandTotal - paidAmount; // negative
+    amountDiff = dueAmount; // negative
   }
 
   if (amountDiff === 0) return;
@@ -110,15 +118,16 @@ export const createSale = async (req, res) => {
       paidAmount = 0,
       discount = 0,
       customer_id = 0,
+      Customer_name,
       grandTotal_from_client,
       sale_type,
       createdBy,
       cut_debit = false,
     } = req.body;
 
-    console.log("dddddddddddddddddddddd " + sale_type);
+    console.log("This use for edit updated price ",items);
 
-    // Basic validation
+
     if (!items || items.length === 0) {
       throw new Error("Cart is empty");
     }
@@ -131,7 +140,7 @@ export const createSale = async (req, res) => {
       throw new Error("Created by is required");
     }
 
-    let subtotal = 0;
+    let subtotal = 0; // total before discount
     const validatedItems = [];
     const productMap = {};
 
@@ -155,10 +164,11 @@ export const createSale = async (req, res) => {
 
       // Negative stock allowed temporarily
       let price = 0;
+
       if(sale_type === "wholesale"){
         price = Number(product.wholesale_price);
       } else {
-        price = Number(product.sellingPrice);
+        price = Number(product.sellingPrice); // this should be change because in frontend can change the price
       }
       const lineTotal = item.quantity * price;
 
@@ -173,16 +183,10 @@ export const createSale = async (req, res) => {
       });
     }
 
-    // Totals
+    
     const discountValue = Number(discount) || 0;
-    const grandTotal = Math.max(subtotal - discountValue, 0);
 
-    // if (
-    //   grandTotal_from_client !== undefined &&
-    //   Math.abs(grandTotal - grandTotal_from_client) > 0.01
-    // ) {
-    //   throw new Error("Grand total mismatch. Please refresh.");
-    // }
+    const grandTotal = Math.max(subtotal - discountValue, 0);  // total after discount
 
     const { balance, dueAmount } = calculatePayment({
         paymentMethod,
@@ -221,6 +225,7 @@ export const createSale = async (req, res) => {
       dueAmount,
       customer_id:
         customer_id === 0 || customer_id === null ? null : customer_id,
+      Customer_name,
       createdBy,
     });
 
@@ -233,6 +238,7 @@ export const createSale = async (req, res) => {
       grandTotal,
       cut_debit,
       selling_id,
+      dueAmount,
       session,
     });
 
@@ -471,3 +477,19 @@ export const getSaleDetailsById = async (req, res) => {
     });
   }
 };
+
+export const recentSale =  async (req, res) => {
+    try{
+        const recentSale = await Sale.find({},selling_id, customer_id, paymentMethod, sale_type, grandTotal, createdAt, dueAmount).limit(10);
+        res.status(200).json({
+            success: true,
+            todaysaleData: recentSale,
+        });
+    }catch{
+        res.status(500).json({
+            success: false,
+            message: "Failed to get today's sales data.",
+            error: error.message,
+        });
+    }
+}

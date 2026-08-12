@@ -99,7 +99,9 @@ export const addProduct = async (req, res) => {
 // for get product list
 export const getProductList = async (req, res) => {
   try {
-    const products = await Product.find({}, { _id: 0, __v: 0 }).sort({ product_id: -1 }).limit(15);
+    const products = await Product.find({}, { _id: 0, __v: 0 }).sort({ product_id: -1 }).limit(10);
+
+    console.log("Fetched products:", products);
 
     res.status(200).json({
       message: "Product list fetched successfully",
