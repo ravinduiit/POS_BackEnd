@@ -2,11 +2,21 @@ import mongoose from "mongoose";
 import Sale from "../models/Sale.js";
 import Product from "../models/Product.js";
 import Customer from "../models/Customer.js";
+import Cart from "../models/Cart.js";
 import Counter from "../models/Counter.js";
 
 const generateSellingId = async (session) => {
   const counter = await Counter.findOneAndUpdate(
     { id: "sell_id" },
+    { $inc: { seq: 1 } },
+    { returnDocument: "after", upsert: true, session }
+  );
+  return counter.seq;
+};
+
+const generateCartId = async (session) => {
+  const counter = await Counter.findOneAndUpdate(
+    { id: "cart_id" },
     { $inc: { seq: 1 } },
     { returnDocument: "after", upsert: true, session }
   );
@@ -492,4 +502,203 @@ export const recentSale =  async (req, res) => {
             error: error.message,
         });
     }
-}
+};
+
+export const createCart = async (req, res) => {
+  try {
+    const {
+      items,
+      discount = 0,
+      paymentMethod,
+      paidAmount = 0,
+      customer_id = 0,
+      customer_name = null,
+      sale_type,
+      createdBy,
+    } = req.body;
+
+    if (!items || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Cart must contain at least one item",
+      });
+    }
+
+    if (!sale_type) {
+      return res.status(400).json({
+        success: false,
+        message: "Sale type is required",
+      });
+    };
+
+    const cart_id = await generateCartId();
+
+
+    const processedItems = items.map((item) => {
+      const quantity = Number(item.quantity);
+      const sellingPrice = Number(item.sellingPrice);
+
+      if (!item.product_id || !item.name) {
+        throw new Error("Each cart item must have product_id and name");
+      }
+
+      if (quantity <= 0) {
+        throw new Error(
+          `Quantity must be greater than 0 for product ${item.name}`
+        );
+      }
+      const lineTotal = quantity * sellingPrice;
+
+      return {
+        product_id: item.product_id,
+        name: item.name,
+        quantity,
+        sellingPrice,
+        lineTotal,
+      };
+    });
+
+    // Calculate subtotal
+    const subtotal = processedItems.reduce(
+      (total, item) => total + item.lineTotal,
+      0
+    );
+
+    // Validate discount
+    const discountAmount = Number(discount);
+
+    if (discountAmount < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Discount cannot be negative",
+      });
+    }
+
+    if (discountAmount > subtotal) {
+      return res.status(400).json({
+        success: false,
+        message: "Discount cannot be greater than subtotal",
+      });
+    }
+
+    // Calculate final bill amount
+    const grandTotal = subtotal - discountAmount;
+
+    // Validate paid amount
+    const paid = Number(paidAmount);
+
+    if (paid < 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Paid amount cannot be negative",
+      });
+    }
+
+    // Calculate balance
+    const balance = Math.max(paid - grandTotal, 0);
+
+    // Calculate due amount
+    const dueAmount = Math.max(grandTotal - paid, 0);
+
+    // Create cart
+    const cart = await Cart.create({
+      cart_id,
+      items: processedItems,
+
+      subtotal,
+      discount: discountAmount,
+      grandTotal,
+
+      paymentMethod,
+      paidAmount: paid,
+      balance,
+
+      customer_id,
+      customer_name,
+
+      dueAmount,
+
+      sale_type,
+      createdBy,
+
+      cartStatus: "active",
+    });
+
+    return res.status(201).json({
+      success: true,
+      message: "Cart created successfully",
+      data: cart,
+    });
+  } catch (error) {
+    console.error("Create cart error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to create cart",
+    });
+  }
+};
+
+export const getCartList = async (req, res) => {
+  try {
+    const carts = await Cart.find().sort({ createdAt: -1 }).select("customer_name cart_id grandTotal createdAt cartStatus items customer_id paymentMethod paidAmount discount dueAmount sale_type createdBy");  
+    return res.status(200).json({
+      success: true,
+      data: carts,
+    });
+  } catch (error) {
+    console.error("Get cart list error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to get cart list",
+    });
+  }
+};
+
+export const getCartByCustomerId = async (req, res) => {
+  try {
+    const { keyword } = req.body;
+    console.log("Keyword received:", keyword.keyword);
+    const cart = await Cart.find({ customer_name: { $regex: keyword.keyword, $options: "i" } });
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: cart,
+    });
+  } catch (error) {
+    console.error("Get cart by customer ID error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to get cart by customer ID",
+    });
+  }
+};
+
+export const getCartById = async (req, res) => {
+  try {
+    const { cart_id } = req.body;
+    const cart = await Cart.findOne({ cart_id });
+    if (!cart) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      data: cart,
+    });
+  } catch (error) {
+    console.error("Get cart by ID error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to get cart by ID",
+    });
+  }
+};
+
