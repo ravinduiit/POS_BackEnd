@@ -33,8 +33,20 @@ const productSchema = new Schema(
       trim: true,
     },
 
+    category_name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     brand_id: {
       type: Number,
+      default: null,
+      trim: true,
+    },
+
+    brand_name: {
+      type: String,
       default: null,
       trim: true,
     },

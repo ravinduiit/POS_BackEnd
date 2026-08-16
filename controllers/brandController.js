@@ -184,3 +184,38 @@ export const toggleBrandStatus = async (req, res) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+export const deleteBrand = async (req, res) => {
+  try {
+    const { brand_id } = req.body;
+
+    if (!brand_id || isNaN(brand_id)) {
+      return res.status(400).json({
+        error: "Valid brand_id is required",
+      });
+    }
+
+    const brand = await Brand.findOneAndDelete({ brand_id: Number(brand_id) });
+
+    if (!brand) {
+      return res.status(404).json({
+        error: "Brand not found",
+      });
+    }
+    
+    res.status(200).json({
+      message: "Brand deleted successfully",
+      brand: {
+        brand_id: brand.brand_id,
+        name: brand.name,
+        description: brand.description,
+        isActive: brand.isActive,
+      },
+    });
+  } catch (error) {
+    console.error("Delete brand error:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+

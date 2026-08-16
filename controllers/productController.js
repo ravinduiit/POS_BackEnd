@@ -4,13 +4,14 @@ import Counter from "../models/Counter.js";
 // for add a product
 export const addProduct = async (req, res) => {
   try {
-    console.log("add product called");
     const {
       name,
       sinhala_name,
       barcode,
       category_id,
+      category_name,
       brand_id,
+      brand_name,
       unit,
       costPrice,
       sellingPrice,
@@ -22,10 +23,13 @@ export const addProduct = async (req, res) => {
       wholesale_price,
       image,
     } = req.body;
-
+    console.log("Request body:", req.body);
     if (
       !name ||
       !category_id ||
+      !category_name ||
+      !brand_id ||
+      !brand_name ||
       !unit ||
       costPrice === undefined ||
       sellingPrice === undefined ||
@@ -56,6 +60,8 @@ export const addProduct = async (req, res) => {
       brand_id: brand_id || "",
       unit,
       best_price,
+      category_name,
+      brand_name,
       wholesale_price,
       costPrice: Number(costPrice),
       sellingPrice: Number(sellingPrice),
@@ -78,6 +84,8 @@ export const addProduct = async (req, res) => {
         category: newProduct.category,
         brand: newProduct.brand,
         unit: newProduct.unit,
+        category_name: newProduct.category_name,
+        brand_name: newProduct.brand_name,
         wholesale_price: newProduct.wholesale_price,
         best_price: newProduct.best_price,
         costPrice: newProduct.costPrice,
@@ -154,8 +162,10 @@ export const updateProduct = async (req, res) => {
       name,
       sinhala_name,
       barcode,
-      category,
-      brand,
+      category_id,
+      category_name,
+      brand_id,
+      brand_name,
       unit,
       costPrice,
       sellingPrice,
@@ -197,8 +207,10 @@ export const updateProduct = async (req, res) => {
     if (name !== undefined) product.name = name;
     if (sinhala_name !== undefined) product.sinhala_name = sinhala_name;
     if (barcode !== undefined) product.barcode = barcode;
-    if (category !== undefined) product.category = category;
-    if (brand !== undefined) product.brand = brand;
+    if (category_id !== undefined) product.category_id = Number(category_id);
+    if (category_name !== undefined) product.category_name = category_name;
+    if (brand_id !== undefined) product.brand_id = Number(brand_id);
+    if (brand_name !== undefined) product.brand_name = brand_name;
     if (best_price !== undefined) product.best_price = Number(best_price);
     if (unit !== undefined) product.unit = unit;
     if (costPrice !== undefined) product.costPrice = Number(costPrice);
@@ -222,8 +234,10 @@ export const updateProduct = async (req, res) => {
         name: product.name,
         sinhala_name: product.sinhala_name,
         barcode: product.barcode,
-        category: product.category,
-        brand: product.brand,
+        category_id: product.category_id,
+        category_name: product.category_name,
+        brand_id: product.brand_id,
+        brand_name: product.brand_name,
         unit: product.unit,
         costPrice: product.costPrice,
         sellingPrice: product.sellingPrice,
